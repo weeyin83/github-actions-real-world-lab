@@ -165,7 +165,7 @@ are being changed.
 ## Exercise 3: Change an input and environment variable
 
 1. Run manually with `learner_name` set to `Release Engineer`.
-2. Confirm the application greeting changes, but the four test results do not:
+2. Confirm the application greeting changes, but the test results do not:
    tests supply their own inputs rather than depending on your manual input.
 3. Change `env.LAB_NAME` to `My fundamentals experiment` on your branch.
 4. Push while its PR is open and verify the environment-information step shows
@@ -240,7 +240,7 @@ is claimed until you have pushed and observed it on GitHub.
 
 ## Expected outcome and completion checklist
 
-- [ ] Four local tests pass.
+- [ ] All local tests pass (four original unit tests; Lab 2 adds three integration tests).
 - [ ] Workflow syntax/structure passes available validation.
 - [ ] A `main` push, a PR open/update, and a manual dispatch each produce the
       expected successful hosted run.

@@ -9,6 +9,8 @@
   },
   "scripts": {
     "start": "node src/index.js",
-    "test": "node --test"
+    "test": "node --test",
+    "test:unit": "node --test tests/greeting.test.js",
+    "test:integration": "node --test tests/cli.test.js"
   }
 }

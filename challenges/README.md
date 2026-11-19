@@ -15,3 +15,8 @@ Start with [Lab 1: missing checkout](01-missing-checkout.yml.disabled).
 The [lab instructions](../labs/01-workflow-fundamentals/README.md#exercise-4-break-and-fix-checkout)
 explain how to reproduce it safely by temporarily editing the existing workflow.
 Do not copy every challenge into the active workflow directory.
+
+Next, [Lab 2: missing needs](02-missing-needs.yml.disabled) demonstrates valid
+YAML with a broken dependency gate. Follow the
+[Lab 2 exercise](../labs/02-matrix-strategies/README.md#exercise-5-break-and-fix-a-dependency)
+to reproduce it on a practice branch and restore the dependency afterwards.

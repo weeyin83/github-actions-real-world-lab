@@ -25,6 +25,23 @@ Both PR testing and the subsequent merge push can run; those are separate,
 intentional checks. Experiments may temporarily broaden triggers; restore the
 baseline after observing the result.
 
+## What Lab 2 adds
+
+Lab 2 is manual-only. Its two Node.js versions x two test suites create four
+matrix jobs with `max-parallel: 2`, plus up to two lightweight downstream jobs.
+Every job has a five-minute timeout. The concurrency cap is not a limit on the
+total jobs or total minutes.
+
+The optional injection input deliberately fails one cell before installation.
+It is off by default. `fail_fast` is also off by default so learners can inspect
+all combinations; enabling it can cancel unfinished matrix jobs after failure.
+There are no artificial delays, uploads, package writes or deployments.
+The readiness job prints a message only; the report never overrides a failed
+matrix. Do not replace these teaching steps with real publishing operations.
+
+Run the manual experiments one at a time and restore practice-branch changes
+before merging. Lab 1 continues to run its normal push/PR checks independently.
+
 ## Free-account use does not mean unlimited usage
 
 Standard GitHub-hosted runners are free for public repositories. Private

@@ -1,0 +1,80 @@
+name: Lab 02 - Matrix strategies and dependencies
+
+on:
+  workflow_dispatch:
+    inputs:
+      fail_fast:
+        description: Cancel queued or running matrix jobs after a failure
+        type: boolean
+        required: true
+        default: false
+      inject_failure:
+        description: Deliberately fail the Node.js 22 unit job
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Node ${{ matrix.node }} / ${{ matrix.suite }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: ${{ inputs.fail_fast }}
+      max-parallel: 2
+      matrix:
+        node: ['22', '24']
+        suite: [unit, integration]
+
+    steps:
+      - name: Optional deliberate matrix failure
+        if: ${{ inputs.inject_failure && matrix.node == '22' && matrix.suite == 'unit' }}
+        run: |
+          printf 'Intentional Lab 2 failure: Node.js 22 / unit.\n' >&2
+          exit 1
+
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up matrix Node.js version
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run the selected test suite
+        env:
+          TEST_SUITE: ${{ matrix.suite }}
+        run: npm run "test:$TEST_SUITE"
+
+  ready:
+    name: Readiness gate (no build or deployment)
+    needs: test
+    if: ${{ needs.test.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Confirm every matrix combination passed
+        run: printf 'All four matrix jobs passed. A later lab can build here.\n'
+
+  report:
+    name: Report matrix result
+    needs: test
+    if: ${{ always() && !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Report without hiding failures
+        env:
+          MATRIX_RESULT: ${{ needs.test.result }}
+        run: |
+          printf 'Matrix job result: %s\n' "$MATRIX_RESULT"
+          printf 'This report does not override the test jobs or their failures.\n'

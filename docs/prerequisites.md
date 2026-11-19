@@ -38,7 +38,9 @@ npm start
 Remove-Item Env:\LEARNER_NAME
 ```
 
-Expected: four passing tests and a greeting using `engineer` or `Alex`.
+Expected: seven passing tests in the current repository (four original unit
+tests plus three integration tests added in Lab 2), and a greeting using
+`engineer` or `Alex`.
 `npm ci` succeeds even though there are currently no dependencies: the committed
 lockfile supplies the reproducible installation contract used by CI.
 

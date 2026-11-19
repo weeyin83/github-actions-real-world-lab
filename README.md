@@ -9,6 +9,7 @@ workflows, experiments and troubleshooting are the product.
 1. Read [prerequisites and repository setup](docs/prerequisites.md).
 2. Read [safety and cost controls](docs/safety-and-costs.md).
 3. Work through [Lab 1: Workflow fundamentals](labs/01-workflow-fundamentals/README.md).
+4. Continue to [Lab 2: Matrix strategies and job dependencies](labs/02-matrix-strategies/README.md).
 
 On Windows, open PowerShell in the project folder:
 
@@ -27,7 +28,7 @@ workload. Docker is not needed until Lab 6.
 | Lab | Focus | Status |
 | --- | --- | --- |
 | 1 | Workflow structure, triggers, inputs, runners and environment variables | Available |
-| 2 | Multidimensional matrix, parallelism and job dependencies | Awaiting approval |
+| 2 | Multidimensional matrix, parallelism and job dependencies | Available |
 | 3 | Variable scopes, contexts and step/job outputs | Awaiting approval |
 | 4 | Workflow artefacts, retention and packages | Awaiting approval |
 | 5 | Dummy secrets, token permissions, external secrets and OIDC | Awaiting approval |
@@ -35,21 +36,27 @@ workload. Docker is not needed until Lab 6.
 | 7 | Custom actions, reuse and lifecycle cleanup | Awaiting approval |
 | 8 | Integrated CI/CD and manual simulated deployment | Awaiting approval |
 
-Only Lab 1 is implemented. Later labs will be added individually after review;
+Labs 1 and 2 are implemented. Later labs will be added individually after review;
 there are no placeholder workflows that appear to implement later objectives.
 
 ## Current layout
 
-- [Active workflow](.github/workflows/lab-01-fundamentals.yml): runs on pushes to
+- [Lab 1 workflow](.github/workflows/lab-01-fundamentals.yml): runs on pushes to
   `main`, pull requests targeting `main`, and manual dispatch.
+- [Lab 2 workflow](.github/workflows/lab-02-matrix.yml): manual-only Node.js
+  22/24 x unit/integration matrix with failure and dependency experiments.
 - [Application](src/index.js) and [tests](tests/greeting.test.js): minimal CI workload.
 - [Labs](labs/01-workflow-fundamentals/README.md): scenarios, YAML explanations,
   practical tasks, troubleshooting and exam knowledge.
 - [Challenges](challenges/README.md): intentionally broken, disabled examples.
 - [Documentation](docs/prerequisites.md): setup and shared safety guidance.
 
-The local folder may remain named `github-actions-lab`; the project and intended
-GitHub repository name are `github-actions-real-world-lab`.
+The local folder may remain named `github-actions-lab`; the project and
+[GitHub repository](https://github.com/weeyin83/github-actions-real-world-lab)
+are named `github-actions-real-world-lab`.
+
+Lab 2 adds `npm run test:unit` and `npm run test:integration`; `npm test` still
+runs every test (now seven in total). No application dependencies were added.
 
 ## Version policy
 
