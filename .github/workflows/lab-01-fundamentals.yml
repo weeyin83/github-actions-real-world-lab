@@ -1,0 +1,61 @@
+name: Lab 01 - Workflow fundamentals
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      learner_name:
+        description: A non-sensitive name to use in the greeting
+        required: true
+        default: engineer
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  LAB_NAME: Workflow fundamentals
+
+jobs:
+  test:
+    name: Test the Node.js workload
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+
+      - name: Install dependencies from the lockfile
+        run: npm ci
+
+      - name: Inspect selected environment variables
+        run: |
+          printf 'Lab: %s\n' "$LAB_NAME"
+          printf 'Event: %s\n' "$GITHUB_EVENT_NAME"
+          printf 'Repository: %s\n' "$GITHUB_REPOSITORY"
+          printf 'Ref: %s\n' "$GITHUB_REF"
+          printf 'Commit: %s\n' "$GITHUB_SHA"
+          printf 'Run number: %s\n' "$GITHUB_RUN_NUMBER"
+          printf 'Runner OS: %s\n' "$RUNNER_OS"
+          node --version
+          npm --version
+
+      - name: Run application tests
+        run: npm test
+
+      - name: Run the application
+        env:
+          LEARNER_NAME: ${{ inputs.learner_name || 'engineer' }}
+        run: npm start

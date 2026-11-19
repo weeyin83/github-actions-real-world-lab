@@ -1,0 +1,24 @@
+# INTENTIONALLY BROKEN: npm ci cannot find this repository's lockfile.
+# This file is inert here. Follow the Lab 1 exercise to reproduce and fix it.
+name: BROKEN - Missing checkout
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
