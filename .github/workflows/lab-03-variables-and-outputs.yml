@@ -1,0 +1,127 @@
+name: Lab 03 - Variables and outputs
+
+on:
+  workflow_dispatch:
+    inputs:
+      omit_output:
+        description: Deliberately omit the step output to break cross-job transfer
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  LAB_NAME: Variables and outputs
+  SCOPE_DEMO: workflow
+
+jobs:
+  prepare:
+    name: Generate and export a version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SCOPE_DEMO: job
+      BUILD_CHANNEL: ${{ vars.LAB_BUILD_CHANNEL || 'practice' }}
+    outputs:
+      build_version: ${{ steps.version.outputs.build_version }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+
+      - name: Inspect job scope and selected contexts
+        env:
+          CONTEXT_SCOPE: ${{ env.SCOPE_DEMO }}
+          TRIGGER_ACTOR: ${{ github.actor }}
+        run: |
+          printf 'Lab: %s\n' "$LAB_NAME"
+          printf 'Job scope via shell: %s\n' "$SCOPE_DEMO"
+          printf 'Job scope via env context: %s\n' "$CONTEXT_SCOPE"
+          printf 'Non-sensitive channel: %s\n' "$BUILD_CHANNEL"
+          printf 'Actor via github context: %s\n' "$TRIGGER_ACTOR"
+          if [[ "$SCOPE_DEMO" != job || "$CONTEXT_SCOPE" != job ]]; then
+            printf 'Expected the job-level scope override.\n' >&2
+            exit 1
+          fi
+
+      - name: Inspect a step-level override
+        env:
+          SCOPE_DEMO: step
+        run: |
+          printf 'Step scope: %s\n' "$SCOPE_DEMO"
+          if [[ "$SCOPE_DEMO" != step ]]; then
+            printf 'Expected the step-level scope override.\n' >&2
+            exit 1
+          fi
+
+      - name: Generate version for environment and output
+        id: version
+        env:
+          OMIT_OUTPUT: ${{ inputs.omit_output }}
+        run: |
+          base_version=$(node -p "require('./package.json').version")
+          version="${base_version}-lab.${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}+${GITHUB_SHA:0:7}"
+          printf 'BUILD_VERSION=%s\n' "$version" >> "$GITHUB_ENV"
+          if [[ "$OMIT_OUTPUT" == true ]]; then
+            printf 'Intentionally omitting GITHUB_OUTPUT for the troubleshooting exercise.\n'
+          else
+            printf 'build_version=%s\n' "$version" >> "$GITHUB_OUTPUT"
+          fi
+          printf 'Current-step local variable: %s\n' "$version"
+          printf 'Current-step BUILD_VERSION: %s\n' "${BUILD_VERSION-<not available until the next step>}"
+
+      - name: Read values in a later step of the same job
+        env:
+          STEP_VERSION: ${{ steps.version.outputs.build_version }}
+        run: |
+          printf 'Scope after the step override: %s\n' "$SCOPE_DEMO"
+          printf 'Later-step environment version: %s\n' "${BUILD_VERSION:?Missing BUILD_VERSION from GITHUB_ENV}"
+          printf 'Later-step output version: %s\n' "$STEP_VERSION"
+          if [[ "$SCOPE_DEMO" != job ]]; then
+            printf 'A step override must not change later steps.\n' >&2
+            exit 1
+          fi
+
+  consume:
+    name: Verify the version in a different job
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      RECEIVED_VERSION: ${{ needs.prepare.outputs.build_version }}
+    steps:
+      - name: Verify scope isolation and the transferred version
+        env:
+          CONTEXT_SCOPE: ${{ env.SCOPE_DEMO }}
+          SOURCE_REPOSITORY: ${{ github.repository }}
+        run: |
+          printf 'Consumer scope: %s\n' "$SCOPE_DEMO"
+          printf 'Consumer env-context scope: %s\n' "$CONTEXT_SCOPE"
+          printf 'Repository via github context: %s\n' "$SOURCE_REPOSITORY"
+          if [[ "$SCOPE_DEMO" != workflow || "$CONTEXT_SCOPE" != workflow ]]; then
+            printf 'Expected workflow scope in a job without an override.\n' >&2
+            exit 1
+          fi
+          if [[ -n "${BUILD_VERSION-}" ]]; then
+            printf 'Producer-local BUILD_VERSION must not cross job boundaries.\n' >&2
+            exit 1
+          fi
+          if [[ -z "$RECEIVED_VERSION" ]]; then
+            printf 'Missing job output: check GITHUB_OUTPUT, step id, output mapping and needs.\n' >&2
+            exit 1
+          fi
+          if [[ ! "$RECEIVED_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-lab\.[0-9]+\.[0-9]+\+[0-9a-f]{7}$ ]]; then
+            printf 'Transferred version has an unexpected format: %s\n' "$RECEIVED_VERSION" >&2
+            exit 1
+          fi
+          printf 'Verified cross-job version: %s\n' "$RECEIVED_VERSION"

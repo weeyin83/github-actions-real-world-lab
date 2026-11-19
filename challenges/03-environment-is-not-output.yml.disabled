@@ -1,0 +1,29 @@
+# INTENTIONALLY BROKEN: GITHUB_ENV does not transfer values to another job.
+# This file is inert. Follow Lab 3 to repair the missing output contract.
+name: BROKEN - Environment variable mistaken for a job output
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Set a value for later steps of this job only
+        run: printf 'BUILD_VERSION=0.1.0-lab.1.1+abcdef0\n' >> "$GITHUB_ENV"
+
+  consume:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Incorrectly expect an environment variable from another job
+        run: |
+          if [[ -z "${BUILD_VERSION-}" ]]; then
+            printf 'Expected failure: GITHUB_ENV is limited to the producing job.\n' >&2
+            exit 1
+          fi
+          printf 'Version: %s\n' "$BUILD_VERSION"

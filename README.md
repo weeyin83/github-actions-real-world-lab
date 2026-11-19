@@ -10,6 +10,7 @@ workflows, experiments and troubleshooting are the product.
 2. Read [safety and cost controls](docs/safety-and-costs.md).
 3. Work through [Lab 1: Workflow fundamentals](labs/01-workflow-fundamentals/README.md).
 4. Continue to [Lab 2: Matrix strategies and job dependencies](labs/02-matrix-strategies/README.md).
+5. Explore [Lab 3: Environment variables and outputs](labs/03-variables-and-outputs/README.md).
 
 On Windows, open PowerShell in the project folder:
 
@@ -29,14 +30,14 @@ workload. Docker is not needed until Lab 6.
 | --- | --- | --- |
 | 1 | Workflow structure, triggers, inputs, runners and environment variables | Available |
 | 2 | Multidimensional matrix, parallelism and job dependencies | Available |
-| 3 | Variable scopes, contexts and step/job outputs | Awaiting approval |
+| 3 | Variable scopes, contexts and step/job outputs | Available |
 | 4 | Workflow artefacts, retention and packages | Awaiting approval |
 | 5 | Dummy secrets, token permissions, external secrets and OIDC | Awaiting approval |
 | 6 | Docker and explicitly enabled GHCR publishing | Awaiting approval |
 | 7 | Custom actions, reuse and lifecycle cleanup | Awaiting approval |
 | 8 | Integrated CI/CD and manual simulated deployment | Awaiting approval |
 
-Labs 1 and 2 are implemented. Later labs will be added individually after review;
+Labs 1-3 are implemented. Later labs will be added individually after review;
 there are no placeholder workflows that appear to implement later objectives.
 
 ## Current layout
@@ -45,6 +46,8 @@ there are no placeholder workflows that appear to implement later objectives.
   `main`, pull requests targeting `main`, and manual dispatch.
 - [Lab 2 workflow](.github/workflows/lab-02-matrix.yml): manual-only Node.js
   22/24 x unit/integration matrix with failure and dependency experiments.
+- [Lab 3 workflow](.github/workflows/lab-03-variables-and-outputs.yml): manual-only
+  variable scopes and a generated version passed between two jobs.
 - [Application](src/index.js) and [tests](tests/greeting.test.js): minimal CI workload.
 - [Labs](labs/01-workflow-fundamentals/README.md): scenarios, YAML explanations,
   practical tasks, troubleshooting and exam knowledge.

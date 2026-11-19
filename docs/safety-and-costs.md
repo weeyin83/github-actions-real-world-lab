@@ -42,6 +42,22 @@ matrix. Do not replace these teaching steps with real publishing operations.
 Run the manual experiments one at a time and restore practice-branch changes
 before merging. Lab 1 continues to run its normal push/PR checks independently.
 
+## What Lab 3 adds
+
+Lab 3 is manual-only, with two sequential Ubuntu jobs and a five-minute timeout
+per job. It generates and validates a non-sensitive version string; there is no
+application build, artefact upload, package publication or deployment.
+
+The optional `omit_output` input is false by default. Enabling it deliberately
+breaks output transfer and produces a failed consumer job, not a successful
+fallback. It changes no repository settings or source defaults.
+
+An optional repository **variable** named `LAB_BUILD_CHANNEL` can contain the
+non-sensitive label `training`. The workflow works without it, using `practice`.
+This is not a secret exercise: never put credentials in configuration variables,
+environment files, outputs or inputs. Do not change organisation variables.
+Only selected non-sensitive metadata is printed, not entire contexts.
+
 ## Free-account use does not mean unlimited usage
 
 Standard GitHub-hosted runners are free for public repositories. Private

@@ -20,3 +20,8 @@ Next, [Lab 2: missing needs](02-missing-needs.yml.disabled) demonstrates valid
 YAML with a broken dependency gate. Follow the
 [Lab 2 exercise](../labs/02-matrix-strategies/README.md#exercise-5-break-and-fix-a-dependency)
 to reproduce it on a practice branch and restore the dependency afterwards.
+
+[Lab 3: environment is not output](03-environment-is-not-output.yml.disabled)
+shows why `$GITHUB_ENV` cannot transfer a version between jobs. Follow the
+[Lab 3 troubleshooting exercises](../labs/03-variables-and-outputs/README.md#exercise-4-diagnose-a-mistaken-cross-job-environment-variable);
+the active workflow also has an explicit, default-off output-omission switch.
